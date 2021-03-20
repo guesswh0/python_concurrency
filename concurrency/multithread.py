@@ -1,19 +1,21 @@
 import concurrent.futures
 
-import helpers
 import tasks
-from concurrency import *
+import tools
+
+NUM_TASKS = 40
+WORKERS = 8
 
 
-@helpers.timeit
+@tools.timeit
 def main(task, *args, **kwargs):
-    """Multi-process solution (parallel execution).
+    """Multiple threading solution.
 
-    :param task: CPU bound blocking task
+    :param task: blocking (IO-bound) task
     :type task: callable
     """
 
-    with concurrent.futures.ProcessPoolExecutor(NUM_CORES) as executor:
+    with concurrent.futures.ThreadPoolExecutor() as executor:
         fs = [
             executor.submit(task, *args, **kwargs)
             for _ in range(NUM_TASKS)

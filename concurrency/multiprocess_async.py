@@ -1,16 +1,19 @@
 import asyncio
 import multiprocessing
 
-import helpers
 import tasks
-from concurrency import *
+import tools
+
+NUM_TASKS = 24
+WORKERS = 4
 
 
-@helpers.atimeit
+@tools.async_timeit
 async def process_tasks(task, *args, **kwargs):
     fs = []
-    # lets assume that number tasks equally divisible by number of cores
-    for _ in range(NUM_TASKS // NUM_CORES):
+    # let assume that the number of tasks
+    # are equally separable to number of workers
+    for _ in range(NUM_TASKS // WORKERS):
         fs.append(asyncio.create_task(task(*args, **kwargs)))
     await asyncio.wait(fs)
 
@@ -19,21 +22,20 @@ def runner(task, *args, **kwargs):
     asyncio.run(process_tasks(task, *args, **kwargs))
 
 
-@helpers.timeit
+@tools.timeit
 def main(task, *args, **kwargs):
-    """Multi-process and asynchronous solution.
-    Each process runs a separate event loop.
+    """Using a multiple processes, with each running a separate event loop.
 
-    :param task: IO and CPU bound "complex" task.
+    :param task: sequence of non blocking and blocking (CPU-bound) tasks.
     :type task: coroutine function
     """
 
     processes = []
-    for _ in range(NUM_CORES):
+    for _ in range(WORKERS):
         p = multiprocessing.Process(
             target=runner,
             args=(task, *args),
-            kwargs={**kwargs}
+            kwargs=kwargs
         )
         processes.append(p)
         p.start()
@@ -43,4 +45,4 @@ def main(task, *args, **kwargs):
 
 
 if __name__ == '__main__':
-    main(tasks.complex_task1)
+    main(tasks.complex_task1, 1, 1)

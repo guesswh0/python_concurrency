@@ -1,15 +1,16 @@
 import asyncio
 
-import helpers
 import tasks
-from concurrency import *
+import tools
+
+NUM_TASKS = 100
 
 
-@helpers.atimeit
+@tools.async_timeit
 async def main(task, *args, **kwargs):
-    """Asynchronous solution
+    """Asynchronous solution (concurrent execution).
 
-    :param task: IO bound non blocking task.
+    :param task: non blocking task
     :type task: coroutine function
     """
 

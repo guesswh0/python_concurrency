@@ -1,13 +1,13 @@
-import helpers
 import tasks
-from concurrency import *
+import tools
+
+NUM_TASKS = 10
 
 
-@helpers.timeit
+@tools.timeit
 def main(task, *args, **kwargs):
-    """Synchronous solution
-
-    :param task: IO/CPU bound blocking task.
+    """Synchronous solution (sequential execution).
+    :param task: blocking IO/CPU task
     :type task: callable
     """
 
