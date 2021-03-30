@@ -6,7 +6,6 @@ import tasks
 import tools
 
 NUM_TASKS = 24
-WORKERS = 8
 
 
 @tools.async_timeit
@@ -21,7 +20,7 @@ async def case1(non_blocking_task, blocking_task):
         aws.append(asyncio.create_task(non_blocking_task()))
     fs = []
 
-    with concurrent.futures.ThreadPoolExecutor(WORKERS) as executor:
+    with concurrent.futures.ThreadPoolExecutor() as executor:
         for coro in asyncio.as_completed(aws):
             await coro
             fs.append(executor.submit(blocking_task))

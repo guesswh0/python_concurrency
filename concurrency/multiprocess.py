@@ -1,10 +1,11 @@
 import concurrent.futures
+from multiprocessing import cpu_count
 
 import tasks
 import tools
 
 NUM_TASKS = 20
-WORKERS = 4
+WORKERS = cpu_count() - 1
 
 
 @tools.timeit

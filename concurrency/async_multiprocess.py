@@ -1,12 +1,13 @@
 import asyncio
 import concurrent.futures
 import functools
+from multiprocessing import cpu_count
 
 import tasks
 import tools
 
 NUM_TASKS = 24
-WORKERS = 4
+WORKERS = cpu_count() - 1
 
 
 @tools.async_timeit
@@ -35,7 +36,7 @@ async def case2(non_blocking_task, blocking_task):
     Case: [blocking task] --> [non blocking task]
     """
     fs = []
-    with concurrent.futures.ProcessPoolExecutor() as executor:
+    with concurrent.futures.ProcessPoolExecutor(WORKERS) as executor:
         loop = asyncio.get_running_loop()
         for i in range(NUM_TASKS):
             fs.append(loop.run_in_executor(executor, blocking_task))

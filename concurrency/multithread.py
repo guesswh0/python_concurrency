@@ -4,7 +4,6 @@ import tasks
 import tools
 
 NUM_TASKS = 40
-WORKERS = 8
 
 
 @tools.timeit

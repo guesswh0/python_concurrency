@@ -6,8 +6,6 @@ from functools import wraps
 
 
 def get_logger():
-    log = logging.getLogger()
-    log.setLevel(logging.NOTSET)
     # stdout stream handler
     out = logging.StreamHandler(sys.stdout)
     out.setLevel(logging.INFO)
@@ -19,7 +17,7 @@ def get_logger():
         ' %(message)s',
         '%H:%M:%S'
     ))
-    log.addHandler(out)
+
     # stderr stream handler
     err = logging.StreamHandler(sys.stderr)
     err.setLevel(logging.WARNING)
@@ -30,6 +28,10 @@ def get_logger():
         ' %(message)s',
         '%H:%M:%S'
     ))
+
+    log = logging.getLogger()
+    log.setLevel(logging.NOTSET)
+    log.addHandler(out)
     log.addHandler(err)
     return log
 
@@ -60,11 +62,19 @@ def async_timeit(coro):
     return wrapper
 
 
+def _format_args(*args, **kwargs):
+    s1 = ','.join(str(arg) for arg in args)
+    s2 = ','.join(f'{key}={value}' for key, value in kwargs.items())
+    if not s2:
+        return s1
+    return ','.join((s1, s2))
+
+
 def log_task(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
         name = uuid.uuid4().hex[:5]
-        s = ','.join(str(arg) for arg in args)
+        s = _format_args(*args, **kwargs)
         logger.info(f"{fn.__name__}({s}): {name}")
         t1 = time.perf_counter()
         fn(*args, **kwargs)
@@ -78,7 +88,7 @@ def log_async_task(coro):
     @wraps(coro)
     async def wrapper(*args, **kwargs):
         name = uuid.uuid4().hex[:5]
-        s = ','.join(str(arg) for arg in args)
+        s = _format_args(*args, **kwargs)
         logger.info(f"{coro.__name__}({s}): {name}")
         t1 = time.perf_counter()
         await coro(*args, **kwargs)

@@ -1,11 +1,11 @@
 import asyncio
-import multiprocessing
+from multiprocessing import Process, cpu_count
 
 import tasks
 import tools
 
 NUM_TASKS = 24
-WORKERS = 4
+WORKERS = cpu_count() - 1
 
 
 @tools.async_timeit
@@ -32,7 +32,7 @@ def main(task, *args, **kwargs):
 
     processes = []
     for _ in range(WORKERS):
-        p = multiprocessing.Process(
+        p = Process(
             target=runner,
             args=(task, *args),
             kwargs=kwargs
